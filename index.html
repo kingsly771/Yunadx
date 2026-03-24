@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuna_panel DX — Next-Gen Hosting Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --bg2: #0a0f1e;
+    --bg3: #0f1629;
+    --card: #0d1525;
+    --card2: #111c30;
+    --border: #1e3a5f;
+    --border2: #2a4a6e;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --accent6: #f472b6;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+    --glow2: 0 0 20px rgba(124,58,237,0.3);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+  body::after {
+    content:'';
+    position:fixed;
+    top:-50%;left:-50%;
+    width:200%;height:200%;
+    background: radial-gradient(ellipse at 20% 20%, rgba(0,212,255,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(124,58,237,0.04) 0%, transparent 50%);
+    pointer-events:none;
+    z-index:0;
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes bgPulse { from{opacity:0.5} to{opacity:1} }
+
+  /* SIDEBAR */
+  .sidebar {
+    position:fixed;
+    left:0; top:0; bottom:0;
+    width:240px;
+    background: linear-gradient(180deg, #080d1a 0%, #050a15 100%);
+    border-right: 1px solid var(--border);
+    z-index:100;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .sidebar::after {
+    content:'';
+    position:absolute;
+    top:0;right:0;
+    width:1px;height:100%;
+    background: linear-gradient(180deg, transparent, var(--accent), transparent);
+    animation: lineGlow 3s ease-in-out infinite;
+  }
+  @keyframes lineGlow { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  .logo-area {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background: linear-gradient(135deg, #00d4ff15, #7c3aed15);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 8px 12px;
+    width:100%;
+  }
+  .logo-icon {
+    width:32px;height:32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;
+    flex-shrink:0;
+    box-shadow: var(--glow);
+  }
+  .logo-text { display:flex; flex-direction:column; }
+  .logo-name {
+    font-family:'Orbitron',monospace;
+    font-size:11px;
+    font-weight:700;
+    color:var(--accent);
+    letter-spacing:1px;
+  }
+  .logo-sub {
+    font-size:9px;
+    color:var(--text3);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    font-family:'Share Tech Mono',monospace;
+  }
+
+  .sidebar-status {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    color:var(--text3);
+  }
+  .status-dot {
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .nav-section-label {
+    padding: 14px 20px 6px;
+    font-size:10px;
+    letter-spacing:3px;
+    color:var(--text3);
+    text-transform:uppercase;
+    font-family:'Share Tech Mono',monospace;
+  }
+  .nav-item {
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding: 9px 20px;
+    cursor:pointer;
+    transition: all 0.2s;
+    position:relative;
+    color: var(--text2);
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:0.5px;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover {
+    background: rgba(0,212,255,0.05);
+    color: var(--text);
+    border-left-color: var(--accent);
+  }
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(0,212,255,0.12), transparent);
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+  .nav-item .icon { width:18px; text-align:center; font-size:15px; }
+  .nav-badge {
+    margin-left:auto;
+    background: var(--accent2);
+    color:#fff;
+    font-size:9px;
+    padding:2px 6px;
+    border-radius:10px;
+    font-family:'Share Tech Mono',monospace;
+  }
+  .nav-badge.green { background:var(--accent3); }
+  .nav-badge.red { background:var(--accent5); }
+  .nav-badge.yellow { background:var(--accent4); color:#000; }
+
+  .sidebar-footer {
+    margin-top:auto;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .user-card {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    background:var(--card);
+    border-radius:10px;
+    border:1px solid var(--border);
+  }
+  .user-avatar {
+    width:34px;height:34px;
+    border-radius:50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+    flex-shrink:0;
+    box-shadow: var(--glow);
+  }
+  .user-name { font-size:13px; font-weight:600; color:var(--text); }
+  .user-plan { font-size:10px; color:var(--accent); font-family:'Share Tech Mono',monospace; }
+
+  /* MAIN CONTENT */
+  .main {
+    margin-left:240px;
+    min-height:100vh;
+    position:relative;
+    z-index:1;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    height:60px;
+    background: rgba(8,13,26,0.9);
+    border-bottom:1px solid var(--border);
+    backdrop-filter:blur(10px);
+    display:flex;
+    align-items:center;
+    padding: 0 28px;
+    gap:16px;
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+  .topbar-title {
+    font-family:'Orbitron',monospace;
+    font-size:15px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .topbar-title span { color:var(--accent); }
+  .topbar-spacer { flex:1; }
+  .search-bar {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:6px 14px;
+    width:260px;
+    font-family:'Rajdhani',sans-serif;
+  }
+  .search-bar input {
+    background:none;
+    border:none;
+    outline:none;
+    color:var(--text);
+    font-size:13px;
+    width:100%;
+    font-family:'Rajdhani',sans-serif;
+  }
+  .search-bar input::placeholder { color:var(--text3); }
+  .topbar-btn {
+    width:36px;height:36px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text2);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;
+    transition:all 0.2s;
+    position:relative;
+  }
+  .topbar-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .notif-dot {
+    position:absolute;
+    top:6px;right:6px;
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--accent5);
+    border:1px solid var(--bg);
+  }
+
+  /* CONTENT */
+  .content { padding:28px; }
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+  }
+  .section-title {
+    font-family:'Orbitron',monospace;
+    font-size:18px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .section-title span { color:var(--accent); }
+  .section-sub { color:var(--text3); font-size:13px; margin-top:3px; }
+
+  /* STATS ROW */
+  .stats-grid {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:24px;
+  }
+  .stat-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+    transition:all 0.3s;
+    cursor:default;
+  }
+  .stat-card::before {
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:2px;
+    background: linear-gradient(90deg, var(--c1,var(--accent)), var(--c2,var(--accent2)));
+  }
+  .stat-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+  .stat-label { font-size:11px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; font-family:'Share Tech Mono',monospace; margin-bottom:10px; }
+  .stat-value { font-family:'Orbitron',monospace; font-size:28px; font-weight:700; color:var(--text); }
+  .stat-value span { font-size:14px; color:var(--text3); }
+  .stat-change { font-size:12px; margin-top:6px; }
+  .stat-change.up { color:var(--accent3); }
+  .stat-change.down { color:var(--accent5); }
+  .stat-icon {
+    position:absolute;
+    right:18px;top:50%;
+    transform:translateY(-50%);
+    font-size:36px;
+    opacity:0.12;
+  }
+
+  /* CARDS */
+  .card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:20px;
+  }
+  .card-title {
+    font-size:15px;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card-title .dot {
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow: var(--glow);
+  }
+
+  /* BOT/SERVICE CARDS */
+  .services-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
+    gap:16px;
+  }
+  .service-card {
+    background:var(--card2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+    transition:all 0.3s;
+    position:relative;
+    overflow:hidden;
+  }
+  .service-card::after {
+    content:'';
+    position:absolute;
+    inset:0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.03), transparent);
+    pointer-events:none;
+  }
+  .service-card:hover { border-color:var(--border2); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+  .service-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+  .service-avatar {
+    width:44px;height:44px;
+    border-radius:12px;
+    background: linear-gradient(135deg, var(--c1,var(--accent)), var(--c2,var(--accent2)));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+    flex-shrink:0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .service-info { flex:1; min-width:0; }
+  .service-name { font-size:15px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .service-type { font-size:11px; color:var(--text3); font-family:'Share Tech Mono',monospace; }
+  .service-status {
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:1px;
+    font-family:'Share Tech Mono',monospace;
+  }
+  .service-status.online { background:rgba(16,185,129,0.15); color:var(--accent3); border:1px solid rgba(16,185,129,0.3); }
+  .service-status.offline { background:rgba(239,68,68,0.15); color:var(--accent5); border:1px solid rgba(239,68,68,0.3); }
+  .service-status.idle { background:rgba(245,158,11,0.15); color:var(--accent4); border:1px solid rgba(245,158,11,0.3); }
+  .service-status::before {
+    content:'';width:5px;height:5px;border-radius:50%;background:currentColor;
+    animation:pulse 2s infinite;
+  }
+  .service-meta {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .meta-item { background:var(--bg2); border-radius:8px; padding:8px 10px; }
+  .meta-label { font-size:10px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+  .meta-value { font-size:13px; font-weight:600; color:var(--text); font-family:'Share Tech Mono',monospace; }
+  .service-actions { display:flex; gap:8px; }
+  .btn {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    font-family:'Rajdhani',sans-serif;
+    cursor:pointer;
+    transition:all 0.2s;
+    border:none;
+    letter-spacing:0.5px;
+  }
+  .btn-sm { padding:6px 12px; font-size:12px; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #0099cc);
+    color:#000;
+    box-shadow: 0 0 12px rgba(0,212,255,0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 0 20px rgba(0,212,255,0.5); transform:translateY(-1px); }
+  .btn-secondary { background:var(--card); color:var(--text2); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-danger { background:rgba(239,68,68,0.15); color:var(--accent5); border:1px solid rgba(239,68,68,0.3); }
+  .btn-danger:hover { background:rgba(239,68,68,0.25); }
+  .btn-success { background:rgba(16,185,129,0.15); color:var(--accent3); border:1px solid rgba(16,185,129,0.3); }
+  .btn-success:hover { background:rgba(16,185,129,0.25); }
+  .btn-purple { background:rgba(124,58,237,0.15); color:var(--accent2); border:1px solid rgba(124,58,237,0.3); }
+  .btn-purple:hover { background:rgba(124,58,237,0.25); }
+  .btn-full { width:100%; justify-content:center; }
+
+  /* PROGRESS BAR */
+  .progress { background:var(--bg2); border-radius:100px; height:6px; overflow:hidden; margin:6px 0; }
+  .progress-bar { height:100%; border-radius:100px; background: linear-gradient(90deg, var(--c1,var(--accent)), var(--c2,var(--accent2))); transition:width 0.5s; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; }
+  thead th {
+    text-align:left;
+    padding:10px 14px;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--text3);
+    text-transform:uppercase;
+    font-family:'Share Tech Mono',monospace;
+    border-bottom:1px solid var(--border);
+  }
+  tbody tr { border-bottom:1px solid rgba(30,58,95,0.4); transition:background 0.2s; }
+  tbody tr:hover { background:rgba(0,212,255,0.03); }
+  tbody td { padding:12px 14px; font-size:14px; color:var(--text2); }
+  .td-name { color:var(--text); font-weight:600; }
+  .td-mono { font-family:'Share Tech Mono',monospace; font-size:12px; }
+
+  /* CONSOLE */
+  .console {
+    background:#010508;
+    border:1px solid #0f2a3a;
+    border-radius:10px;
+    padding:16px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:12px;
+    height:200px;
+    overflow-y:auto;
+    color:#4ade80;
+    line-height:1.7;
+  }
+  .console .log-time { color:var(--text3); margin-right:8px; }
+  .console .log-warn { color:var(--accent4); }
+  .console .log-error { color:var(--accent5); }
+  .console .log-info { color:var(--accent); }
+  .console .log-success { color:var(--accent3); }
+
+  /* DEPLOY FORM */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-label { font-size:12px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; font-family:'Share Tech Mono',monospace; }
+  .form-input {
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+    color:var(--text);
+    font-size:14px;
+    font-family:'Rajdhani',sans-serif;
+    outline:none;
+    transition:border-color 0.2s;
+  }
+  .form-input:focus { border-color:var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.08); }
+  .form-input::placeholder { color:var(--text3); }
+  select.form-input { cursor:pointer; }
+  .form-input option { background:var(--bg2); }
+
+  /* RESOURCE RING */
+  .resource-rings {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    text-align:center;
+  }
+  .resource-ring { position:relative; display:inline-flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
+  .ring-svg { width:100px; height:100px; }
+  .ring-bg { fill:none; stroke:var(--bg2); stroke-width:8; }
+  .ring-fill { fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+  .ring-center { position:absolute; top:50%; left:50%; transform:translate(-50%, -60%); text-align:center; }
+  .ring-percent { font-family:'Orbitron',monospace; font-size:16px; font-weight:700; }
+  .ring-sub { font-size:10px; color:var(--text3); margin-top:2px; }
+  .ring-label { font-size:13px; color:var(--text2); font-weight:600; }
+
+  /* DOMAIN CARD */
+  .domain-item {
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px;
+    background:var(--bg2);
+    border-radius:10px;
+    border:1px solid var(--border);
+    margin-bottom:10px;
+    transition:all 0.2s;
+  }
+  .domain-item:hover { border-color:var(--border2); }
+  .domain-icon { width:36px;height:36px; border-radius:8px; background:var(--card2); display:flex;align-items:center;justify-content:center; font-size:16px; flex-shrink:0; }
+  .domain-name { font-size:14px; font-weight:600; color:var(--text); font-family:'Share Tech Mono',monospace; }
+  .domain-meta { font-size:12px; color:var(--text3); }
+  .domain-ssl { display:inline-flex; align-items:center; gap:4px; color:var(--accent3); font-size:11px; font-family:'Share Tech Mono',monospace; }
+  .domain-actions { margin-left:auto; display:flex; gap:8px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(4px);
+    z-index:200;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.3s;
+  }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal {
+    background:var(--card);
+    border:1px solid var(--border2);
+    border-radius:16px;
+    padding:28px;
+    width:500px;
+    max-width:95vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    transform:translateY(20px);
+    transition:transform 0.3s;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .modal-overlay.open .modal { transform:translateY(0); }
+  .modal-title {
+    font-family:'Orbitron',monospace;
+    font-size:16px;
+    font-weight:700;
+    color:var(--accent);
+    margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .modal-close {
+    margin-left:auto;
+    width:28px;height:28px;
+    border-radius:6px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    color:var(--text3);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+  }
+  .modal-close:hover { color:var(--accent5); border-color:var(--accent5); }
+
+  /* TABS */
+  .tabs { display:flex; gap:2px; margin-bottom:20px; background:var(--bg2); padding:4px; border-radius:10px; }
+  .tab {
+    flex:1;
+    padding:8px 14px;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--text3);
+    cursor:pointer;
+    text-align:center;
+    transition:all 0.2s;
+    letter-spacing:0.5px;
+  }
+  .tab.active { background:var(--card2); color:var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+  /* TOGGLE */
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
+  .toggle-row:last-child { border-bottom:none; }
+  .toggle-info .toggle-name { font-size:14px; font-weight:600; color:var(--text); }
+  .toggle-info .toggle-desc { font-size:12px; color:var(--text3); margin-top:2px; }
+  .toggle {
+    width:42px;height:24px;
+    border-radius:12px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    cursor:pointer;
+    position:relative;
+    transition:all 0.3s;
+    flex-shrink:0;
+  }
+  .toggle.on { background:var(--accent); border-color:var(--accent); box-shadow: var(--glow); }
+  .toggle::after {
+    content:'';
+    position:absolute;
+    top:3px;left:3px;
+    width:16px;height:16px;
+    border-radius:50%;
+    background:#fff;
+    transition:all 0.3s;
+  }
+  .toggle.on::after { left:21px; }
+
+  /* TOAST */
+  .toast-area { position:fixed; top:20px; right:20px; z-index:999; display:flex; flex-direction:column; gap:10px; }
+  .toast {
+    background:var(--card2);
+    border:1px solid var(--border2);
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:13px;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:280px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+    border-left: 3px solid var(--accent3);
+  }
+  @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes toastOut { from{opacity:1} to{opacity:0;transform:translateX(20px)} }
+
+  /* ACTIVITY FEED */
+  .activity-item {
+    display:flex;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid rgba(30,58,95,0.4);
+  }
+  .activity-item:last-child { border-bottom:none; }
+  .activity-dot {
+    width:10px;height:10px;
+    border-radius:50%;
+    margin-top:4px;
+    flex-shrink:0;
+  }
+  .activity-text { font-size:13px; color:var(--text2); line-height:1.5; }
+  .activity-text strong { color:var(--text); }
+  .activity-time { font-size:11px; color:var(--text3); margin-top:3px; font-family:'Share Tech Mono',monospace; }
+
+  /* PLAN CARDS */
+  .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .plan-card {
+    background:var(--card2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+    text-align:center;
+    transition:all 0.3s;
+    position:relative;
+    overflow:hidden;
+  }
+  .plan-card.featured {
+    border-color:var(--accent);
+    box-shadow: var(--glow);
+  }
+  .plan-card.featured::before {
+    content:'POPULAR';
+    position:absolute;
+    top:12px;right:-20px;
+    background:var(--accent);
+    color:#000;
+    font-size:9px;
+    font-weight:700;
+    padding:4px 30px;
+    transform:rotate(45deg);
+    font-family:'Share Tech Mono',monospace;
+    letter-spacing:1px;
+  }
+  .plan-name { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--text3); margin-bottom:8px; letter-spacing:2px; }
+  .plan-price { font-family:'Orbitron',monospace; font-size:32px; font-weight:900; color:var(--text); }
+  .plan-price span { font-size:14px; color:var(--text3); }
+  .plan-features { text-align:left; margin:16px 0; list-style:none; }
+  .plan-features li { padding:6px 0; font-size:13px; color:var(--text2); display:flex; align-items:center; gap:8px; }
+  .plan-features li::before { content:'✓'; color:var(--accent3); font-weight:700; }
+
+  /* RESPONSIVE */
+  @media(max-width:900px) {
+    .stats-grid { grid-template-columns:repeat(2,1fr); }
+    .form-grid { grid-template-columns:1fr; }
+    .plans-grid { grid-template-columns:1fr; }
+    .resource-rings { grid-template-columns:repeat(3,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="logo-area">
+    <div class="logo-badge">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">
+        <div class="logo-name">YUNA_PANEL</div>
+        <div class="logo-sub">DX Edition</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-status">
+    <div class="status-dot"></div>
+    All systems operational
+  </div>
+
+  <div class="nav-section-label">Control</div>
+  <div class="nav-item active" onclick="navigate('dashboard',this)"><span class="icon">🏠</span> Dashboard</div>
+  <div class="nav-item" onclick="navigate('bots',this)"><span class="icon">🤖</span> Bot Manager <span class="nav-badge green">5</span></div>
+  <div class="nav-item" onclick="navigate('websites',this)"><span class="icon">🌐</span> Websites <span class="nav-badge">3</span></div>
+  <div class="nav-item" onclick="navigate('deploy',this)"><span class="icon">🚀</span> Deploy</div>
+  <div class="nav-item" onclick="navigate('databases',this)"><span class="icon">🗄️</span> Databases <span class="nav-badge">4</span></div>
+  <div class="nav-item" onclick="navigate('domains',this)"><span class="icon">🔗</span> Domains <span class="nav-badge green">SSL</span></div>
+
+  <div class="nav-section-label">Tools</div>
+  <div class="nav-item" onclick="navigate('console',this)"><span class="icon">💻</span> Console</div>
+  <div class="nav-item" onclick="navigate('files',this)"><span class="icon">📁</span> File Manager</div>
+  <div class="nav-item" onclick="navigate('scheduler',this)"><span class="icon">⏰</span> Scheduler</div>
+  <div class="nav-item" onclick="navigate('analytics',this)"><span class="icon">📊</span> Analytics</div>
+  <div class="nav-item" onclick="navigate('logs',this)"><span class="icon">📋</span> Logs <span class="nav-badge red">12</span></div>
+  <div class="nav-item" onclick="navigate('env',this)"><span class="icon">🔐</span> Env Variables</div>
+  <div class="nav-item" onclick="navigate('backups',this)"><span class="icon">💾</span> Backups</div>
+  <div class="nav-item" onclick="navigate('webhooks',this)"><span class="icon">🔔</span> Webhooks</div>
+  <div class="nav-item" onclick="navigate('network',this)"><span class="icon">🌍</span> Network / CDN</div>
+
+  <div class="nav-section-label">Account</div>
+  <div class="nav-item" onclick="navigate('billing',this)"><span class="icon">💳</span> Billing</div>
+  <div class="nav-item" onclick="navigate('settings',this)"><span class="icon">⚙️</span> Settings</div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div>
+        <div class="user-name">Admin User</div>
+        <div class="user-plan">PRO PLAN</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Yuna_panel <span>DX</span></div>
+    <div class="topbar-spacer"></div>
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search bots, domains, services...">
+    </div>
+    <button class="topbar-btn" onclick="openModal('deploy-modal')">🚀</button>
+    <button class="topbar-btn" onclick="showToast('No new alerts', 'info')">
+      🔔<span class="notif-dot"></span>
+    </button>
+    <button class="topbar-btn" onclick="navigate('settings', document.querySelector('.nav-item:last-child'))">⚙️</button>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Overview <span>//</span> Dashboard</div>
+          <div class="section-sub">Welcome back, Admin — Here's your infrastructure at a glance.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('deploy-modal')">🚀 Quick Deploy</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" style="--c1:#00d4ff;--c2:#7c3aed">
+          <div class="stat-label">Active Bots</div>
+          <div class="stat-value">5 <span>/ 10</span></div>
+          <div class="stat-change up">↑ 2 this week</div>
+          <div class="stat-icon">🤖</div>
+        </div>
+        <div class="stat-card" style="--c1:#10b981;--c2:#059669">
+          <div class="stat-label">Websites Online</div>
+          <div class="stat-value">3 <span>/ 5</span></div>
+          <div class="stat-change up">↑ All healthy</div>
+          <div class="stat-icon">🌐</div>
+        </div>
+        <div class="stat-card" style="--c1:#f59e0b;--c2:#d97706">
+          <div class="stat-label">CPU Usage</div>
+          <div class="stat-value">34<span>%</span></div>
+          <div class="stat-change up">↓ Low load</div>
+          <div class="stat-icon">⚡</div>
+        </div>
+        <div class="stat-card" style="--c1:#f472b6;--c2:#ec4899">
+          <div class="stat-label">RAM Used</div>
+          <div class="stat-value">1.2<span>GB</span></div>
+          <div class="stat-change">of 4GB total</div>
+          <div class="stat-icon">💾</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+        <div>
+          <div class="card">
+            <div class="card-title"><span class="dot"></span> Running Services</div>
+            <div class="services-grid">
+              <div class="service-card">
+                <div class="service-header">
+                  <div class="service-avatar" style="--c1:#7c3aed;--c2:#a855f7">🤖</div>
+                  <div class="service-info">
+                    <div class="service-name">MusicBot Pro</div>
+                    <div class="service-type">DISCORD BOT</div>
+                  </div>
+                  <div class="service-status online">ONLINE</div>
+                </div>
+                <div class="service-meta">
+                  <div class="meta-item"><div class="meta-label">Uptime</div><div class="meta-value">99.8%</div></div>
+                  <div class="meta-item"><div class="meta-label">RAM</div><div class="meta-value">128MB</div></div>
+                </div>
+                <div class="service-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Console opened for MusicBot Pro','info')">💻</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('MusicBot Pro restarting...','warn')">↺ Restart</button>
+                  <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('MusicBot Pro details loaded','success')">Manage</button>
+                </div>
+              </div>
+              <div class="service-card">
+                <div class="service-header">
+                  <div class="service-avatar" style="--c1:#10b981;--c2:#34d399">🌐</div>
+                  <div class="service-info">
+                    <div class="service-name">portfolio.io</div>
+                    <div class="service-type">WEB APP</div>
+                  </div>
+                  <div class="service-status online">ONLINE</div>
+                </div>
+                <div class="service-meta">
+                  <div class="meta-item"><div class="meta-label">Requests</div><div class="meta-value">1.2k/h</div></div>
+                  <div class="meta-item"><div class="meta-label">Latency</div><div class="meta-value">42ms</div></div>
+                </div>
+                <div class="service-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Logs opened','info')">📋</button>
+                  <button class="btn btn-primary btn-sm" style="flex:1" onclick="navigate('websites',null)">Manage</button>
+                </div>
+              </div>
+              <div class="service-card">
+                <div class="service-header">
+                  <div class="service-avatar" style="--c1:#f59e0b;--c2:#fbbf24">⚙️</div>
+                  <div class="service-info">
+                    <div class="service-name">TaskBot</div>
+                    <div class="service-type">TELEGRAM BOT</div>
+                  </div>
+                  <div class="service-status idle">IDLE</div>
+                </div>
+                <div class="service-meta">
+                  <div class="meta-item"><div class="meta-label">Uptime</div><div class="meta-value">72h</div></div>
+                  <div class="meta-item"><div class="meta-label">RAM</div><div class="meta-value">64MB</div></div>
+                </div>
+                <div class="service-actions">
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Console opened','info')">💻</button>
+                  <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Managing TaskBot','success')">Manage</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title"><span class="dot"></span> Resources</div>
+            <div class="resource-rings">
+              <div class="resource-ring">
+                <svg class="ring-svg" viewBox="0 0 100 100">
+                  <circle class="ring-bg" cx="50" cy="50" r="38"/>
+                  <circle class="ring-fill" cx="50" cy="50" r="38" stroke="#00d4ff"
+                    stroke-dasharray="238.76" stroke-dashoffset="157.6"
+                    transform="rotate(-90 50 50)"/>
+                </svg>
+                <div class="ring-center"><div class="ring-percent" style="color:#00d4ff">34%</div></div>
+                <div class="ring-label">CPU</div>
+              </div>
+              <div class="resource-ring">
+                <svg class="ring-svg" viewBox="0 0 100 100">
+                  <circle class="ring-bg" cx="50" cy="50" r="38"/>
+                  <circle class="ring-fill" cx="50" cy="50" r="38" stroke="#10b981"
+                    stroke-dasharray="238.76" stroke-dashoffset="143.3"
+                    transform="rotate(-90 50 50)"/>
+                </svg>
+                <div class="ring-center"><div class="ring-percent" style="color:#10b981">40%</div></div>
+                <div class="ring-label">RAM</div>
+              </div>
+              <div class="resource-ring">
+                <svg class="ring-svg" viewBox="0 0 100 100">
+                  <circle class="ring-bg" cx="50" cy="50" r="38"/>
+                  <circle class="ring-fill" cx="50" cy="50" r="38" stroke="#f59e0b"
+                    stroke-dasharray="238.76" stroke-dashoffset="190.9"
+                    transform="rotate(-90 50 50)"/>
+                </svg>
+                <div class="ring-center"><div class="ring-percent" style="color:#f59e0b">20%</div></div>
+                <div class="ring-label">DISK</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="dot"></span> Activity Feed</div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#10b981"></div>
+              <div>
+                <div class="activity-text"><strong>MusicBot Pro</strong> deployed successfully</div>
+                <div class="activity-time">2 min ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#00d4ff"></div>
+              <div>
+                <div class="activity-text"><strong>SSL certificate</strong> renewed for portfolio.io</div>
+                <div class="activity-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#f59e0b"></div>
+              <div>
+                <div class="activity-text"><strong>Backup</strong> completed — 2.3GB archived</div>
+                <div class="activity-time">3 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#ef4444"></div>
+              <div>
+                <div class="activity-text"><strong>TaskBot</strong> restart detected — auto-recovered</div>
+                <div class="activity-time">Yesterday</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT MANAGER -->
+    <div class="page" id="page-bots">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Bot <span>Manager</span></div>
+          <div class="section-sub">Manage your Discord, Telegram, WhatsApp and custom bots.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('newbot-modal')">+ New Bot</button>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="setTab(this)">All Bots</div>
+        <div class="tab" onclick="setTab(this)">Discord</div>
+        <div class="tab" onclick="setTab(this)">Telegram</div>
+        <div class="tab" onclick="setTab(this)">Custom</div>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#5865f2;--c2:#7c3aed">🤖</div>
+            <div class="service-info">
+              <div class="service-name">MusicBot Pro</div>
+              <div class="service-type">DISCORD BOT · Node.js</div>
+            </div>
+            <div class="service-status online">ONLINE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Uptime</div><div class="meta-value">99.8%</div></div>
+            <div class="meta-item"><div class="meta-label">RAM</div><div class="meta-value">128MB</div></div>
+            <div class="meta-item"><div class="meta-label">CPU</div><div class="meta-value">3%</div></div>
+            <div class="meta-item"><div class="meta-label">Servers</div><div class="meta-value">142</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-secondary btn-sm" onclick="navigate('console',null)">💻</button>
+            <button class="btn btn-danger btn-sm" onclick="showToast('Restarting MusicBot Pro...','warn')">↺</button>
+            <button class="btn btn-success btn-sm" onclick="showToast('Viewing logs...','info')">📋</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Opening bot settings','success')">Settings</button>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#0088cc;--c2:#00b4d8">📱</div>
+            <div class="service-info">
+              <div class="service-name">TaskBot</div>
+              <div class="service-type">TELEGRAM BOT · Python</div>
+            </div>
+            <div class="service-status idle">IDLE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Uptime</div><div class="meta-value">72h</div></div>
+            <div class="meta-item"><div class="meta-label">RAM</div><div class="meta-value">64MB</div></div>
+            <div class="meta-item"><div class="meta-label">CPU</div><div class="meta-value">0.5%</div></div>
+            <div class="meta-item"><div class="meta-label">Users</div><div class="meta-value">89</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-secondary btn-sm" onclick="navigate('console',null)">💻</button>
+            <button class="btn btn-danger btn-sm" onclick="showToast('Stopping TaskBot...','warn')">■ Stop</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('TaskBot settings','success')">Settings</button>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#ef4444;--c2:#f97316">❌</div>
+            <div class="service-info">
+              <div class="service-name">ModBot</div>
+              <div class="service-type">DISCORD BOT · Python</div>
+            </div>
+            <div class="service-status offline">OFFLINE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Last Seen</div><div class="meta-value">2h ago</div></div>
+            <div class="meta-item"><div class="meta-label">RAM</div><div class="meta-value">0MB</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-success btn-sm btn-full" onclick="showToast('Starting ModBot...','success')">▶ Start</button>
+          </div>
+        </div>
+
+        <div class="service-card" style="border-style:dashed; cursor:pointer" onclick="openModal('newbot-modal')">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:140px;gap:10px;color:var(--text3)">
+            <div style="font-size:32px">+</div>
+            <div style="font-size:14px;font-weight:600">Deploy New Bot</div>
+            <div style="font-size:12px;color:var(--text3)">Click to deploy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEBSITES -->
+    <div class="page" id="page-websites">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Website <span>Manager</span></div>
+          <div class="section-sub">Host and manage your web applications and static sites.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('deploy-modal')">+ Deploy Site</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:#10b981"></span> Hosted Websites</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Domain</th><th>Status</th><th>Framework</th><th>Requests/h</th><th>SSL</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-name">portfolio.io</td>
+                <td class="td-mono">portfolio.io</td>
+                <td><span class="service-status online">ONLINE</span></td>
+                <td><span class="td-mono">React</span></td>
+                <td>1,248</td>
+                <td><span class="domain-ssl">🔒 Valid</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Opening file manager','info')">📁</button>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Viewing analytics','info')">📊</button>
+                  <button class="btn btn-primary btn-sm" onclick="showToast('Managing site','success')">Manage</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name">shop.mystore.com</td>
+                <td class="td-mono">shop.mystore.com</td>
+                <td><span class="service-status online">ONLINE</span></td>
+                <td><span class="td-mono">Next.js</span></td>
+                <td>412</td>
+                <td><span class="domain-ssl">🔒 Valid</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Opening file manager','info')">📁</button>
+                  <button class="btn btn-primary btn-sm" onclick="showToast('Managing site','success')">Manage</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name">api.backend.dev</td>
+                <td class="td-mono">api.backend.dev</td>
+                <td><span class="service-status online">ONLINE</span></td>
+                <td><span class="td-mono">FastAPI</span></td>
+                <td>8,821</td>
+                <td><span class="domain-ssl">🔒 Valid</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Opening logs','info')">📋</button>
+                  <button class="btn btn-primary btn-sm" onclick="showToast('Managing API','success')">Manage</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEPLOY -->
+    <div class="page" id="page-deploy">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Deploy <span>Wizard</span></div>
+          <div class="section-sub">Deploy bots, websites, APIs and more in seconds.</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Choose Type</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button class="btn btn-purple btn-full" onclick="showToast('Discord Bot template loaded','success')" style="flex-direction:column;padding:18px;gap:6px;height:auto">
+              <span style="font-size:24px">🤖</span><span>Discord Bot</span>
+            </button>
+            <button class="btn btn-purple btn-full" onclick="showToast('Telegram Bot template loaded','success')" style="flex-direction:column;padding:18px;gap:6px;height:auto">
+              <span style="font-size:24px">📱</span><span>Telegram Bot</span>
+            </button>
+            <button class="btn btn-success btn-full" onclick="showToast('Website template loaded','success')" style="flex-direction:column;padding:18px;gap:6px;height:auto">
+              <span style="font-size:24px">🌐</span><span>Website</span>
+            </button>
+            <button class="btn btn-secondary btn-full" onclick="showToast('API Server template loaded','success')" style="flex-direction:column;padding:18px;gap:6px;height:auto">
+              <span style="font-size:24px">⚙️</span><span>API Server</span>
+            </button>
+            <button class="btn btn-secondary btn-full" onclick="showToast('Database template loaded','success')" style="flex-direction:column;padding:18px;gap:6px;height:auto">
+              <span style="font-size:24px">🗄️</span><span>Database</span>
+            </button>
+            <button class="btn btn-secondary btn-full" onclick="showToast('Custom app template loaded','success')" style="flex-direction:column;padding:18px;gap:6px;height:auto">
+              <span style="font-size:24px">⚡</span><span>Custom App</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Configuration</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="form-group">
+              <label class="form-label">App Name</label>
+              <input class="form-input" type="text" placeholder="e.g. my-awesome-bot">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Runtime</label>
+              <select class="form-input">
+                <option>Node.js 20</option>
+                <option>Python 3.11</option>
+                <option>Python 3.12</option>
+                <option>Go 1.21</option>
+                <option>Bun</option>
+                <option>Deno</option>
+                <option>Java 21</option>
+                <option>Static HTML</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Git Repository URL</label>
+              <input class="form-input" type="text" placeholder="https://github.com/user/repo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Branch</label>
+              <input class="form-input" type="text" placeholder="main" value="main">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Start Command</label>
+              <input class="form-input" type="text" placeholder="node index.js">
+            </div>
+            <div class="form-group">
+              <label class="form-label">RAM Allocation</label>
+              <select class="form-input">
+                <option>256 MB</option>
+                <option selected>512 MB</option>
+                <option>1 GB</option>
+                <option>2 GB</option>
+                <option>4 GB</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="simulateDeploy()">🚀 Deploy Now</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="deploy-log-card" style="display:none">
+        <div class="card-title"><span class="dot" style="background:#f59e0b"></span> Deployment Log</div>
+        <div class="console" id="deploy-console"></div>
+      </div>
+    </div>
+
+    <!-- DATABASES -->
+    <div class="page" id="page-databases">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Database <span>Manager</span></div>
+          <div class="section-sub">Create and manage databases for your applications.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Creating new database...','success')">+ New Database</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#336791;--c2:#4a90d9">🐘</div>
+            <div class="service-info">
+              <div class="service-name">PostgreSQL DB</div>
+              <div class="service-type">PostgreSQL 15</div>
+            </div>
+            <div class="service-status online">ONLINE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Size</div><div class="meta-value">1.2GB</div></div>
+            <div class="meta-item"><div class="meta-label">Tables</div><div class="meta-value">24</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening pgAdmin...','info')">🔍 Browse</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Database settings','success')">Manage</button>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#00684A;--c2:#10b981">🍃</div>
+            <div class="service-info">
+              <div class="service-name">MongoDB Cluster</div>
+              <div class="service-type">MongoDB 7</div>
+            </div>
+            <div class="service-status online">ONLINE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Size</div><div class="meta-value">450MB</div></div>
+            <div class="meta-item"><div class="meta-label">Collections</div><div class="meta-value">12</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening Compass...','info')">🔍 Browse</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('MongoDB settings','success')">Manage</button>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#ef4444;--c2:#dc2626">🔴</div>
+            <div class="service-info">
+              <div class="service-name">Redis Cache</div>
+              <div class="service-type">Redis 7.2</div>
+            </div>
+            <div class="service-status online">ONLINE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Keys</div><div class="meta-value">8,421</div></div>
+            <div class="meta-item"><div class="meta-label">Memory</div><div class="meta-value">64MB</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening Redis CLI...','info')">💻 CLI</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Redis settings','success')">Manage</button>
+          </div>
+        </div>
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-avatar" style="--c1:#f59e0b;--c2:#d97706">⚡</div>
+            <div class="service-info">
+              <div class="service-name">SQLite · TaskBot</div>
+              <div class="service-type">SQLite 3</div>
+            </div>
+            <div class="service-status online">ONLINE</div>
+          </div>
+          <div class="service-meta">
+            <div class="meta-item"><div class="meta-label">Size</div><div class="meta-value">2.4MB</div></div>
+            <div class="meta-item"><div class="meta-label">Tables</div><div class="meta-value">6</div></div>
+          </div>
+          <div class="service-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening table browser...','info')">🔍 Browse</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('SQLite settings','success')">Manage</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAINS -->
+    <div class="page" id="page-domains">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Domain <span>& DNS</span></div>
+          <div class="section-sub">Manage domains, DNS records and SSL certificates.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Add domain wizard opened','success')">+ Add Domain</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Registered Domains</div>
+        <div class="domain-item">
+          <div class="domain-icon">🌐</div>
+          <div>
+            <div class="domain-name">portfolio.io</div>
+            <div class="domain-meta">Expires: Dec 2025 · Cloudflare DNS</div>
+          </div>
+          <div class="domain-ssl">🔒 SSL Active (Let's Encrypt)</div>
+          <div class="domain-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening DNS manager','info')">DNS</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Domain settings opened','success')">Manage</button>
+          </div>
+        </div>
+        <div class="domain-item">
+          <div class="domain-icon">🛍️</div>
+          <div>
+            <div class="domain-name">shop.mystore.com</div>
+            <div class="domain-meta">Expires: Mar 2026 · Custom DNS</div>
+          </div>
+          <div class="domain-ssl">🔒 SSL Active</div>
+          <div class="domain-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening DNS manager','info')">DNS</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Domain settings opened','success')">Manage</button>
+          </div>
+        </div>
+        <div class="domain-item">
+          <div class="domain-icon">⚡</div>
+          <div>
+            <div class="domain-name">api.backend.dev</div>
+            <div class="domain-meta">Expires: Aug 2026 · Yuna DNS</div>
+          </div>
+          <div class="domain-ssl">🔒 SSL Active (Wildcard)</div>
+          <div class="domain-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Opening DNS manager','info')">DNS</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Domain settings opened','success')">Manage</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSOLE -->
+    <div class="page" id="page-console">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Live <span>Console</span></div>
+          <div class="section-sub">Real-time shell access to your running services.</div>
+        </div>
+        <select class="form-input" style="width:220px">
+          <option>MusicBot Pro</option><option>TaskBot</option><option>portfolio.io</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:#10b981"></span> Terminal · MusicBot Pro</div>
+        <div class="console" id="live-console">
+          <div><span class="log-time">12:34:01</span><span class="log-success">[INFO] Bot connected to Discord gateway</span></div>
+          <div><span class="log-time">12:34:02</span><span class="log-info">[INFO] Logged in as MusicBot#1234</span></div>
+          <div><span class="log-time">12:34:05</span><span class="log-success">[INFO] Serving 142 guilds</span></div>
+          <div><span class="log-time">12:35:11</span>User requested !play song</div>
+          <div><span class="log-time">12:35:12</span><span class="log-info">[AUDIO] Joined voice channel: General</span></div>
+          <div><span class="log-time">12:36:00</span>Memory usage: 128MB</div>
+          <div><span class="log-time">12:40:22</span><span class="log-warn">[WARN] Rate limited on search endpoint</span></div>
+          <div><span class="log-time">12:40:23</span>Retrying in 2s...</div>
+          <div><span class="log-time">12:40:25</span><span class="log-success">[INFO] Search successful</span></div>
+          <div id="console-cursor"><span class="log-info">root@musicbot-pro:~$</span> <span id="console-input-display"></span><span style="animation:pulse 1s infinite">█</span></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <input class="form-input" type="text" id="console-input" placeholder="Type command..." style="flex:1" onkeypress="consoleCmd(event)">
+          <button class="btn btn-primary" onclick="consoleCmd({key:'Enter'})">Send</button>
+          <button class="btn btn-secondary" onclick="showToast('Console cleared','info')">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILE MANAGER -->
+    <div class="page" id="page-files">
+      <div class="section-header">
+        <div>
+          <div class="section-title">File <span>Manager</span></div>
+          <div class="section-sub">Browse, upload and edit files across your services.</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="showToast('Upload dialog opened','info')">⬆️ Upload</button>
+          <button class="btn btn-primary" onclick="showToast('New file created','success')">+ New File</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text3)">
+          📁 <span style="color:var(--accent)">MusicBot Pro</span> / <span>src</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-name">📁 commands</td><td class="td-mono">Folder</td><td>—</td><td>1h ago</td>
+                <td><button class="btn btn-secondary btn-sm" onclick="showToast('Opened folder','info')">Open</button></td>
+              </tr>
+              <tr>
+                <td class="td-name">📁 events</td><td class="td-mono">Folder</td><td>—</td><td>3h ago</td>
+                <td><button class="btn btn-secondary btn-sm" onclick="showToast('Opened folder','info')">Open</button></td>
+              </tr>
+              <tr>
+                <td class="td-name">📄 index.js</td><td class="td-mono">.js</td><td>4.2KB</td><td>2h ago</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing index.js','info')">✏️ Edit</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('File deleted','warn')">🗑</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name">📄 config.json</td><td class="td-mono">.json</td><td>1.1KB</td><td>5h ago</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing config.json','info')">✏️ Edit</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('File deleted','warn')">🗑</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name">📄 package.json</td><td class="td-mono">.json</td><td>876B</td><td>2d ago</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing package.json','info')">✏️ Edit</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('File deleted','warn')">🗑</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULER -->
+    <div class="page" id="page-scheduler">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Task <span>Scheduler</span></div>
+          <div class="section-sub">Schedule cron jobs and automated tasks.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('New task wizard opened','success')">+ New Task</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Task</th><th>Schedule (CRON)</th><th>Last Run</th><th>Next Run</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-name">Database Backup</td>
+                <td class="td-mono">0 3 * * *</td>
+                <td>3:00 AM today</td>
+                <td>Tomorrow 3:00 AM</td>
+                <td><span class="service-status online">ACTIVE</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="showToast('Task paused','warn')">Pause</button></td>
+              </tr>
+              <tr>
+                <td class="td-name">Clear Temp Files</td>
+                <td class="td-mono">0 * * * *</td>
+                <td>1 hour ago</td>
+                <td>In 1 hour</td>
+                <td><span class="service-status online">ACTIVE</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="showToast('Task paused','warn')">Pause</button></td>
+              </tr>
+              <tr>
+                <td class="td-name">SSL Renewal Check</td>
+                <td class="td-mono">0 0 * * 0</td>
+                <td>Sunday</td>
+                <td>Next Sunday</td>
+                <td><span class="service-status idle">PAUSED</span></td>
+                <td><button class="btn btn-success btn-sm" onclick="showToast('Task resumed','success')">Resume</button></td>
+              </tr>
+              <tr>
+                <td class="td-name">Log Rotation</td>
+                <td class="td-mono">0 0 1 * *</td>
+                <td>Mar 1</td>
+                <td>Apr 1</td>
+                <td><span class="service-status online">ACTIVE</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="showToast('Task paused','warn')">Pause</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Analytics <span>& Metrics</span></div>
+          <div class="section-sub">Monitor your services performance and usage.</div>
+        </div>
+        <select class="form-input" style="width:160px">
+          <option>Last 24h</option><option>Last 7 days</option><option>Last 30 days</option>
+        </select>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card" style="--c1:#00d4ff;--c2:#0099cc">
+          <div class="stat-label">Total Requests</div>
+          <div class="stat-value">42.8<span>k</span></div>
+          <div class="stat-change up">↑ 18% vs yesterday</div>
+        </div>
+        <div class="stat-card" style="--c1:#10b981;--c2:#059669">
+          <div class="stat-label">Avg Response Time</div>
+          <div class="stat-value">38<span>ms</span></div>
+          <div class="stat-change up">↓ 12ms improvement</div>
+        </div>
+        <div class="stat-card" style="--c1:#f59e0b;--c2:#d97706">
+          <div class="stat-label">Error Rate</div>
+          <div class="stat-value">0.2<span>%</span></div>
+          <div class="stat-change up">Very low</div>
+        </div>
+        <div class="stat-card" style="--c1:#7c3aed;--c2:#6d28d9">
+          <div class="stat-label">Bandwidth Used</div>
+          <div class="stat-value">4.7<span>GB</span></div>
+          <div class="stat-change">of 100GB/month</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Bandwidth Usage</div>
+        <div style="height:120px;background:var(--bg2);border-radius:8px;display:flex;align-items:flex-end;gap:4px;padding:10px;overflow:hidden">
+          <!-- Simple bar chart visualization -->
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:60%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:75%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:45%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:90%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:65%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:80%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:55%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:70%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:100%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:85%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:40%;opacity:0.8"></div>
+          <div style="flex:1;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;height:72%;opacity:0.8"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="page" id="page-logs">
+      <div class="section-header">
+        <div>
+          <div class="section-title">System <span>Logs</span></div>
+          <div class="section-sub">Full log history for all your services.</div>
+        </div>
+        <button class="btn btn-secondary" onclick="showToast('Logs exported','success')">⬇️ Export</button>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <select class="form-input" style="width:200px"><option>All Services</option><option>MusicBot Pro</option><option>portfolio.io</option></select>
+          <select class="form-input" style="width:140px"><option>All Levels</option><option>ERROR</option><option>WARN</option><option>INFO</option></select>
+        </div>
+        <div class="console" style="height:300px">
+          <div><span class="log-time">12:40:25</span><span class="log-success">[MusicBot] Search successful - user: Alex</span></div>
+          <div><span class="log-time">12:40:22</span><span class="log-warn">[MusicBot] Rate limited on search endpoint</span></div>
+          <div><span class="log-time">12:36:00</span>[MusicBot] Memory usage: 128MB / 512MB</div>
+          <div><span class="log-time">12:35:12</span><span class="log-info">[MusicBot] Joined voice channel: General</span></div>
+          <div><span class="log-time">12:34:05</span><span class="log-success">[MusicBot] Serving 142 guilds</span></div>
+          <div><span class="log-time">12:34:01</span><span class="log-success">[MusicBot] Bot connected to Discord gateway</span></div>
+          <div><span class="log-time">11:42:10</span><span class="log-success">[portfolio.io] GET /about - 200 - 38ms</span></div>
+          <div><span class="log-time">11:42:08</span><span class="log-success">[portfolio.io] GET / - 200 - 22ms</span></div>
+          <div><span class="log-time">11:31:55</span><span class="log-error">[TaskBot] Connection timeout - retrying...</span></div>
+          <div><span class="log-time">11:31:57</span><span class="log-success">[TaskBot] Reconnected to Telegram API</span></div>
+          <div><span class="log-time">10:00:00</span><span class="log-info">[SYSTEM] Backup started</span></div>
+          <div><span class="log-time">10:04:33</span><span class="log-success">[SYSTEM] Backup completed - 2.3GB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENV VARIABLES -->
+    <div class="page" id="page-env">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Environment <span>Variables</span></div>
+          <div class="section-sub">Securely manage secrets and config for each service.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('New variable added','success')">+ Add Variable</button>
+      </div>
+      <div class="card">
+        <div class="tabs" style="margin-bottom:16px">
+          <div class="tab active" onclick="setTab(this)">MusicBot Pro</div>
+          <div class="tab" onclick="setTab(this)">portfolio.io</div>
+          <div class="tab" onclick="setTab(this)">TaskBot</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Key</th><th>Value</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-name td-mono">DISCORD_TOKEN</td>
+                <td class="td-mono">••••••••••••••••••</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Value revealed','info')">👁 Show</button>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing variable','info')">✏️</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('Variable deleted','warn')">🗑</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name td-mono">YOUTUBE_API_KEY</td>
+                <td class="td-mono">••••••••••••••••••</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Value revealed','info')">👁 Show</button>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing variable','info')">✏️</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('Variable deleted','warn')">🗑</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name td-mono">DATABASE_URL</td>
+                <td class="td-mono">••••••••••••••••••</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Value revealed','info')">👁 Show</button>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing variable','info')">✏️</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('Variable deleted','warn')">🗑</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-name td-mono">NODE_ENV</td>
+                <td class="td-mono" style="color:var(--accent3)">production</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Editing variable','info')">✏️</button>
+                  <button class="btn btn-danger btn-sm" onclick="showToast('Variable deleted','warn')">🗑</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKUPS -->
+    <div class="page" id="page-backups">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Backup <span>Manager</span></div>
+          <div class="section-sub">Automatic and manual backups for all your data.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('Manual backup started!','success')">💾 Backup Now</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Service</th><th>Size</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-mono">Today 03:00</td>
+                <td class="td-name">Full System</td>
+                <td>2.3GB</td>
+                <td><span class="service-status online" style="font-size:10px">AUTO</span></td>
+                <td><span class="service-status online">DONE</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Downloading backup...','info')">⬇️</button>
+                  <button class="btn btn-success btn-sm" onclick="showToast('Restoring backup...','warn')">↺ Restore</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-mono">Yesterday 03:00</td>
+                <td class="td-name">Full System</td>
+                <td>2.1GB</td>
+                <td><span class="service-status online" style="font-size:10px">AUTO</span></td>
+                <td><span class="service-status online">DONE</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Downloading backup...','info')">⬇️</button>
+                  <button class="btn btn-success btn-sm" onclick="showToast('Restoring backup...','warn')">↺ Restore</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-mono">Mar 22 14:32</td>
+                <td class="td-name">MusicBot Pro</td>
+                <td>340MB</td>
+                <td><span class="service-status idle" style="font-size:10px">MANUAL</span></td>
+                <td><span class="service-status online">DONE</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Downloading backup...','info')">⬇️</button>
+                  <button class="btn btn-success btn-sm" onclick="showToast('Restoring backup...','warn')">↺ Restore</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEBHOOKS -->
+    <div class="page" id="page-webhooks">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Webhook <span>Manager</span></div>
+          <div class="section-sub">Configure webhooks for deploy events, alerts and more.</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('New webhook wizard opened','success')">+ Add Webhook</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>URL</th><th>Events</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="td-name">Discord Alerts</td>
+                <td class="td-mono">https://discord.com/api/webhooks/...</td>
+                <td>Deploy, Restart, Error</td>
+                <td><span class="service-status online">ACTIVE</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="showToast('Test webhook sent','success')">Test</button>
+                <button class="btn btn-danger btn-sm" onclick="showToast('Webhook deleted','warn')">🗑</button></td>
+              </tr>
+              <tr>
+                <td class="td-name">Slack Notifs</td>
+                <td class="td-mono">https://hooks.slack.com/services/...</td>
+                <td>Deploy, Error</td>
+                <td><span class="service-status idle">PAUSED</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="showToast('Test webhook sent','success')">Test</button>
+                <button class="btn btn-danger btn-sm" onclick="showToast('Webhook deleted','warn')">🗑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NETWORK / CDN -->
+    <div class="page" id="page-network">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Network <span>& CDN</span></div>
+          <div class="section-sub">Configure DDoS protection, CDN, reverse proxy and firewall.</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:#10b981"></span> CDN Settings</div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Global CDN</div><div class="toggle-desc">Cache assets across 30+ global PoPs</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Gzip Compression</div><div class="toggle-desc">Compress responses automatically</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">HTTP/3 (QUIC)</div><div class="toggle-desc">Enable next-gen HTTP protocol</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">WebP Auto Convert</div><div class="toggle-desc">Auto convert images to WebP</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:#ef4444"></span> Security</div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">DDoS Protection</div><div class="toggle-desc">Layer 3/4/7 protection enabled</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">WAF (Firewall)</div><div class="toggle-desc">Block common attack patterns</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Bot Filter</div><div class="toggle-desc">Block malicious crawlers</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Rate Limiting</div><div class="toggle-desc">100 req/min per IP</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="page" id="page-billing">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Billing <span>& Plans</span></div>
+          <div class="section-sub">Manage your subscription and payment methods.</div>
+        </div>
+      </div>
+      <div class="plans-grid" style="margin-bottom:24px">
+        <div class="plan-card">
+          <div class="plan-name">STARTER</div>
+          <div class="plan-price">$0<span>/mo</span></div>
+          <ul class="plan-features">
+            <li>1 Bot</li>
+            <li>1 Website</li>
+            <li>256MB RAM</li>
+            <li>5GB Storage</li>
+            <li>1 Database</li>
+          </ul>
+          <button class="btn btn-secondary btn-full" onclick="showToast('Already on Free plan','info')">Current Plan</button>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-name">PRO</div>
+          <div class="plan-price">$9<span>/mo</span></div>
+          <ul class="plan-features">
+            <li>10 Bots</li>
+            <li>5 Websites</li>
+            <li>4GB RAM total</li>
+            <li>50GB Storage</li>
+            <li>10 Databases</li>
+            <li>Custom Domains</li>
+            <li>Priority Support</li>
+          </ul>
+          <button class="btn btn-primary btn-full" onclick="showToast('Upgrading to Pro!','success')">Upgrade Now</button>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">ULTRA</div>
+          <div class="plan-price">$29<span>/mo</span></div>
+          <ul class="plan-features">
+            <li>Unlimited Bots</li>
+            <li>Unlimited Sites</li>
+            <li>16GB RAM total</li>
+            <li>500GB Storage</li>
+            <li>Unlimited Databases</li>
+            <li>Dedicated IP</li>
+            <li>24/7 Support</li>
+          </ul>
+          <button class="btn btn-purple btn-full" onclick="showToast('Upgrading to Ultra!','success')">Upgrade</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Panel <span>Settings</span></div>
+          <div class="section-sub">Configure your Yuna_panel DX account and preferences.</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Profile Settings</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" value="Admin User"></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="admin@example.com" type="email"></div>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Leave blank to keep current"></div>
+            <button class="btn btn-primary" onclick="showToast('Profile saved!','success')">Save Changes</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot"></span> Preferences</div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Email Notifications</div><div class="toggle-desc">Receive alerts via email</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Auto Restart on Crash</div><div class="toggle-desc">Automatically restart crashed services</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">2FA Authentication</div><div class="toggle-desc">Two-factor security</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Maintenance Mode</div><div class="toggle-desc">Put all sites into maintenance</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on');showToast('Maintenance mode toggled','warn')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="toggle-name">Usage Analytics</div><div class="toggle-desc">Share anonymous usage data</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:#ef4444"></span> Danger Zone</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-danger btn-full" onclick="showToast('⚠️ All services restarted','warn')">🔄 Restart All Services</button>
+            <button class="btn btn-danger btn-full" onclick="showToast('⚠️ Cache purged','warn')">🗑 Purge All Cache</button>
+            <button class="btn btn-danger btn-full" onclick="showToast('⚠️ This would delete your account — demo mode','warn')">💀 Delete Account</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot" style="background:#7c3aed"></span> API Access</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <div style="display:flex;gap:8px">
+                <input class="form-input" value="yuna_sk_live_••••••••••••••••" readonly style="flex:1">
+                <button class="btn btn-secondary" onclick="showToast('API key copied!','success')">Copy</button>
+              </div>
+            </div>
+            <button class="btn btn-purple" onclick="showToast('New API key generated','success')">↺ Regenerate Key</button>
+            <div style="font-size:12px;color:var(--text3)">Use this key to access the Yuna_panel API and automate deployments.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="deploy-modal">
+  <div class="modal">
+    <div class="modal-title">🚀 Quick Deploy <button class="modal-close" onclick="closeModal('deploy-modal')">✕</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">App Name</label><input class="form-input" placeholder="my-awesome-app"></div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-input">
+          <option>🤖 Discord Bot</option><option>📱 Telegram Bot</option><option>🌐 Website</option>
+          <option>⚙️ API Server</option><option>🗄️ Database</option><option>⚡ Custom App</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Git Repository</label><input class="form-input" placeholder="https://github.com/user/repo"></div>
+      <div class="form-group">
+        <label class="form-label">Runtime</label>
+        <select class="form-input">
+          <option>Node.js 20</option><option>Python 3.11</option><option>Go 1.21</option><option>Bun</option><option>Static</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Start Command</label><input class="form-input" placeholder="node index.js"></div>
+      <button class="btn btn-primary btn-full" onclick="simulateDeploy();closeModal('deploy-modal')">🚀 Deploy Now</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="newbot-modal">
+  <div class="modal">
+    <div class="modal-title">🤖 New Bot <button class="modal-close" onclick="closeModal('newbot-modal')">✕</button></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group"><label class="form-label">Bot Name</label><input class="form-input" placeholder="my-bot"></div>
+      <div class="form-group">
+        <label class="form-label">Platform</label>
+        <select class="form-input"><option>Discord</option><option>Telegram</option><option>WhatsApp</option><option>Custom</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Bot Token</label><input class="form-input" type="password" placeholder="Paste your bot token..."></div>
+      <div class="form-group"><label class="form-label">Repository</label><input class="form-input" placeholder="https://github.com/user/bot-repo"></div>
+      <div class="form-group">
+        <label class="form-label">Runtime</label>
+        <select class="form-input"><option>Node.js 20</option><option>Python 3.11</option><option>Bun</option></select>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="showToast('Bot deployed successfully! 🚀','success');closeModal('newbot-modal')">Deploy Bot</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST AREA -->
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+// ---- NAVIGATION ----
+function navigate(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const p = document.getElementById('page-' + page);
+  if (p) p.classList.add('active');
+  if (el) el.classList.add('active');
+  // Update topbar title
+  const titleMap = {
+    dashboard: 'Dashboard', bots: 'Bot Manager', websites: 'Websites',
+    deploy: 'Deploy', databases: 'Databases', domains: 'Domains',
+    console: 'Console', files: 'File Manager', scheduler: 'Scheduler',
+    analytics: 'Analytics', logs: 'Logs', env: 'Env Variables',
+    backups: 'Backups', webhooks: 'Webhooks', network: 'Network & CDN',
+    billing: 'Billing', settings: 'Settings'
+  };
+  document.querySelector('.topbar-title').innerHTML = 'Yuna_panel <span>DX</span> — ' + (titleMap[page] || page);
+}
+
+// ---- TABS ----
+function setTab(el) {
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ---- MODAL ----
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+
+// ---- TOAST ----
+function showToast(msg, type='success') {
+  const area = document.getElementById('toast-area');
+  const toast = document.createElement('div');
+  const icons = {success:'✅', warn:'⚠️', info:'ℹ️', error:'❌'};
+  const colors = {success:'var(--accent3)', warn:'var(--accent4)', info:'var(--accent)', error:'var(--accent5)'};
+  toast.className = 'toast';
+  toast.style.borderLeftColor = colors[type] || colors.success;
+  toast.innerHTML = `<span>${icons[type]||'✅'}</span> ${msg}`;
+  area.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+
+// ---- DEPLOY SIMULATION ----
+function simulateDeploy() {
+  navigate('deploy', null);
+  const card = document.getElementById('deploy-log-card');
+  const console_ = document.getElementById('deploy-console');
+  card.style.display = 'block';
+  console_.innerHTML = '';
+
+  const logs = [
+    {t:'info', m:'[Yuna_panel] Starting deployment pipeline...'},
+    {t:'', m:'[GIT] Cloning repository...'},
+    {t:'success', m:'[GIT] Repository cloned successfully'},
+    {t:'', m:'[BUILD] Installing dependencies with npm install...'},
+    {t:'', m:'[BUILD] node_modules installed (312 packages)'},
+    {t:'', m:'[BUILD] Running build script...'},
+    {t:'success', m:'[BUILD] Build completed successfully'},
+    {t:'info', m:'[DOCKER] Building container image...'},
+    {t:'success', m:'[DOCKER] Image built: yuna/myapp:latest'},
+    {t:'info', m:'[DEPLOY] Starting container...'},
+    {t:'', m:'[HEALTH] Waiting for health check...'},
+    {t:'success', m:'[HEALTH] Service is healthy ✓'},
+    {t:'', m:'[DNS] Updating DNS records...'},
+    {t:'success', m:'[SSL] SSL certificate issued ✓'},
+    {t:'success', m:'[Yuna_panel] 🚀 Deployment successful! Service is live.'},
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if(i >= logs.length) {
+      clearInterval(interval);
+      showToast('Deployment completed successfully! 🚀', 'success');
+      return;
+    }
+    const l = logs[i];
+    const div = document.createElement('div');
+    const now = new Date();
+    const ts = now.toTimeString().slice(0,8);
+    div.innerHTML = `<span class="log-time">${ts}</span><span class="${l.t ? 'log-'+l.t : ''}">${l.m}</span>`;
+    console_.appendChild(div);
+    console_.scrollTop = console_.scrollHeight;
+    i++;
+  }, 300);
+}
+
+// ---- CONSOLE ----
+function consoleCmd(e) {
+  if(e.key !== 'Enter') return;
+  const input = document.getElementById('console-input');
+  const cmd = input.value.trim();
+  if(!cmd) return;
+  const c = document.getElementById('live-console');
+  const now = new Date().toTimeString().slice(0,8);
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="log-time">${now}</span><span class="log-info">root@musicbot-pro:~$</span> ${cmd}`;
+  c.insertBefore(div, document.getElementById('console-cursor'));
+
+  // Simulated responses
+  const responses = {
+    'ls': 'index.js  commands/  events/  config.json  package.json  node_modules/',
+    'pwd': '/home/musicbot-pro',
+    'ps': 'PID 1: node index.js  (uptime: 72h)',
+    'uptime': '72:14:22 up, load: 0.03, 0.04, 0.01',
+    'free': 'Total: 512MB  Used: 128MB  Free: 384MB',
+    'help': 'Available: ls, pwd, ps, uptime, free, clear',
+  };
+
+  const resp = document.createElement('div');
+  const rt = new Date().toTimeString().slice(0,8);
+  const r = responses[cmd.toLowerCase()] || `Command '${cmd}' executed`;
+  resp.innerHTML = `<span class="log-time">${rt}</span><span class="${responses[cmd]?'':'log-success'}">${r}</span>`;
+  c.insertBefore(resp, document.getElementById('console-cursor'));
+  c.scrollTop = c.scrollHeight;
+  input.value = '';
+}
+
+// Animate resource rings on load
+window.addEventListener('load', () => {
+  document.querySelectorAll('.ring-fill').forEach(r => {
+    r.style.strokeDashoffset = r.getAttribute('stroke-dashoffset');
+  });
+});
+</script>
+</body>
+</html>
